@@ -23,7 +23,7 @@ const SignUp = (props) => {
         }
     }, []);
 
-    const migrateDB = (userId) => {
+    const migrateDB = userId => {
         getLocalContacts().then(contacts => {
             contacts.forEach(contact => {
                 if(contact.avatar == null) {
@@ -38,7 +38,8 @@ const SignUp = (props) => {
                             ...contact,
                             avatar: fileUrl,
                             user_id: userId,
-                        }
+                        };
+                        createContact(data);
                     }).catch(err => console.log(err));
                 }
             });

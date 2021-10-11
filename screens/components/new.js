@@ -41,7 +41,7 @@ const NewDlg = (props) => {
     const compressImage = async(uri) => {
         const manipResult = await ImageManipulator.manipulateAsync(
             uri,
-            [{ resize: { width: 100, height: 100 } }],
+            [{ resize: { width: 200, height: 200 } }],
             { compress: 1, format: ImageManipulator.SaveFormat.PNG }
         );
         return manipResult;
