@@ -1,8 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Text, Pressable } from 'react-native';
+import LottieView from 'lottie-react-native';
+import * as FileSystem from 'expo-file-system';
 import Global from '../../utils/global';
 
 const FavItem = (props) => {
+
+    const [isImgLoaded, setImgLoaded] = useState(false);
+    const [img, setImg] = useState(null);
+    const imgUri = FileSystem.cacheDirectory + props.data.docId + '1';
+
+    useEffect(() => {
+        FileSystem.getInfoAsync(imgUri).then(metadata => {
+            if(metadata.exists) {
+                setImg(imgUri);
+                setImgLoaded(true);
+            } else {
+                FileSystem.downloadAsync(props.data.img_1, imgUri).then(({ uri }) => {
+                    setImg(uri);
+                    setImgLoaded(true);
+                }).catch(err => console.log(err));
+            }
+        }).catch(err => console.log(err));
+    }, []);
 
     return (
         <View key={props.diffKey} style={styles.container}>
@@ -12,7 +32,15 @@ const FavItem = (props) => {
                     <Text style={styles.nameText}>{props.data.name}</Text>
                 </View>
                 <View style={{ flex: 4 }}>
-                    <Image source={{ uri: props.data.img_1 }} style={styles.image}/>
+                    {
+                        isImgLoaded ? <Image source={{ uri: img }} style={styles.image}/>
+                        : <LottieView
+                            source={Global.ANIMATION.WAITING}
+                            style={{ width: Global.SIZE.W_115, height: Global.SIZE.W_115 }}
+                            autoPlay
+                            loop
+                          />
+                    }
                 </View>
             </Pressable>
         </View>
