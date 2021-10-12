@@ -35,7 +35,12 @@ const FavList = (props) => {
                     }
                 }).catch(err => console.log(err));
             } else {
-                
+                getContacts(userId).then(result => {
+                    if(result != null) {
+                        setContactData(result);
+                        setLoaded(true);
+                    }
+                }).catch(err => console.log(err));
             }
         });
 

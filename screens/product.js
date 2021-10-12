@@ -9,7 +9,7 @@ import Global from '../utils/global';
 import Header from './components/header';
 import Loading from './loading';
 import GiftCard from './components/giftcard';
-import { getProducts, getContacts } from '../firebase/crud';
+import { getProducts, getContacts, addFavorite } from '../firebase/crud';
 import { addLocalFavorite, getLocalContacts } from '../utils/db';
 import { useSelector, useDispatch } from 'react-redux';
 import { changeRecipient } from '../store/actions/actions';
@@ -126,7 +126,13 @@ const Product = (props) => {
                 }
             }).catch(err => console.log(err));
         } else {
-            
+            addFavorite(userId, recipient, item.docId).then(result => {
+                if(result) {
+                    let target = recipient;
+                    target.favorites.push(item.docId);
+                    dispatch(changeRecipient(target));
+                }
+            }).catch(err => console.log(err));
         }
     }
 

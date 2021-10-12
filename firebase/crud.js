@@ -132,3 +132,27 @@ export async function updateContact(originId, target) {
 
     return result;
 }
+
+export async function addFavorite(userId, target, item) {
+    const ref = db.collection('contacts').where('user_id', '==', userId).where('first_name', '==', target.first_name).where('last_name', '==', target.last_name);
+    const result = ref.get().then(res => {
+        res.forEach(doc => {
+            let favorites = doc.data().favorites;
+            if(!favorites.includes(item))
+                favorites.push(item);
+            else
+                return false;
+            
+            const updateResult = db.collection('contacts').doc(doc.id).update({ favorites: favorites }).then(() => {
+                return true;
+            }).catch(err => {
+                console.log(err);
+                return false;
+            });
+            return updateResult;
+        });
+    }).catch(err => {
+        console.log(err);
+        return false;
+    });
+}

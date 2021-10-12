@@ -5,6 +5,7 @@ import ContactItem from './components/contactitem';
 import Global from '../utils/global';
 import { useSelector } from 'react-redux';
 import { getLocalContacts } from '../utils/db';
+import { getContacts } from '../firebase/crud';
 import Loading from './loading';
 import NewDlg from './components/new';
 import EditDlg from './components/edit';
@@ -33,7 +34,15 @@ const Contact = () => {
                     }
                 }).catch(err => console.log(err));
             } else {
-                
+                getContacts(userId).then(result => {
+                    if(result != null) {
+                        if(result.length < 1)
+                            setAddVisible(true);
+                        else
+                            setData(result);
+                        setLoaded(true);
+                    }
+                }).catch(err => console.log(err));
             }
         }
     }, [addVisible, editVisible]);
