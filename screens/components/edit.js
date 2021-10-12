@@ -6,15 +6,17 @@ import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import Avatar from './avatar';
 import Global from '../../utils/global';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getStringFromDate } from '../../utils/helper';
 import { updateLocalContact, deleteLocalContact } from '../../utils/db';
 import { deleteContact, updateContact, uploadImage } from '../../firebase/crud';
+import { changeRecipient } from '../../store/actions/actions';
 
 const EditDlg = (props) => {
 
     const userId = useSelector(state => state.user.userId);
     const recipient = useSelector(state => state.user.recipient);
+    const dispatch = useDispatch();
 
     const [avatar, setAvatar] = useState(Global.IMAGE.UNKNOWN.uri);
     const [firstName, setFirstName] = useState('');
@@ -84,9 +86,11 @@ const EditDlg = (props) => {
         };
         if(userId == null) {
             updateLocalContact(props.data, data).then(result => {
-                if(result)
+                if(result) {
                     props.onChangeVisible(false);
-                else
+                    if(props.data.first_name == recipient.first_name && props.data.last_name == recipient.last_name)
+                        dispatch(changeRecipient(data));
+                } else
                     Alert.alert('Failed to update the event');
             }).catch(err => console.log(err));
         } else {
@@ -103,9 +107,11 @@ const EditDlg = (props) => {
                             date: date.toString(),
                         };
                         updateContact(props.data.docId, data).then(result => {
-                            if(result)
+                            if(result) {
                                 props.onChangeVisible(false);
-                            else
+                                if(props.data.first_name == recipient.first_name && props.data.last_name == recipient.last_name)
+                                    dispatch(changeRecipient(data));
+                            } else
                                 Alert.alert('Failed to update the event');
                         }).catch(err => console.log(err));
                     }
@@ -119,9 +125,11 @@ const EditDlg = (props) => {
                     date: date.toString(),
                 };
                 updateContact(props.data.docId, data).then(result => {
-                    if(result)
+                    if(result) {
                         props.onChangeVisible(false);
-                    else
+                        if(props.data.first_name == recipient.first_name && props.data.last_name == recipient.last_name)
+                            dispatch(changeRecipient(data));
+                    } else
                         Alert.alert('Failed to update the event');
                 }).catch(err => console.log(err));
             }

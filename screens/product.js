@@ -215,6 +215,7 @@ const Product = (props) => {
                     </Pressable>
                 </View>
             </View>
+            { filterVisible ? <View style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: Global.COLOR.BLACK_40 }}/> : null }
             <FilterDlg
                 visible={filterVisible}
                 data={filterOption}
