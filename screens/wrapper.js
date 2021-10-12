@@ -16,12 +16,20 @@ const AppWrapper = () => {
     const [isLoaded, setLoaded] = useState(false);
     const [isOnline, setOnline] = useState(false);
     const [isConnecting, setConnecting] = useState(false);
+    const [subscribers, setSubscribers] = useState([]);
 
     useEffect(() => {
         NetInfo.fetch().then(state => {
             if(state.isConnected)
                 setOnline(true);
             setLoaded(true);
+        });
+
+        const netSubscriber = NetInfo.addEventListener(state => {
+            if(state.isConnected)
+                setOnline(true);
+            else
+                setOnline(false);
         });
 
         initDB().then(result => {
@@ -49,7 +57,7 @@ const AppWrapper = () => {
             }
         })();
 
-        const subscriber = firebase.auth().onAuthStateChanged(user => {
+        const firebaseSubscriber = firebase.auth().onAuthStateChanged(user => {
             //console.log(user.uid);
             if(user)
                 dispatch(changeUser(user.uid));
@@ -57,7 +65,9 @@ const AppWrapper = () => {
                 dispatch(changeUser(null));
         });
 
-        return subscriber;
+        setSubscribers([...subscribers, netSubscriber, firebaseSubscriber]);
+
+        return () => subscribers.forEach(subscriber => subscriber);
     }, []);
 
     const pressTryConnection = () => {
