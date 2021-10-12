@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Image, Pressable } from 'react-native';
+import * as FileSystem from 'expo-file-system';
 import Global from '../../utils/global';
 import { getOccasionFromDate } from '../../utils/helper';
+import { useSelector } from 'react-redux';
 
 const ContactItem = (props) => {
+
+    const userId = useSelector(state => state.user.userId);
+
+    //const [isImgLoaded, setImgLoaded] = useState(false);
+    const [img, setImg] = useState(null);
+    const imgUri = FileSystem.cacheDirectory + props.data.docId;
+
+    useEffect(() => {
+        if(userId == null) {
+            setImg(props.data.avatar);
+            //setImgLoaded(true);
+        } else {
+            FileSystem.getInfoAsync(imgUri).then(metadata => {
+                if(metadata.exists) {
+                    setImg(imgUri);
+                    //setImgLoaded(true);
+                } else {
+                    FileSystem.downloadAsync(props.data.avatar, imgUri).then(({ uri }) => {
+                        setImg(uri);
+                        //setImgLoaded(true);
+                    }).catch(err => console.log(err));
+                }
+            }).catch(err => console.log(err));
+        }
+    }, []);
 
     return (
         <View key={props.diffKey} style={styles.container}>
             <Pressable style={styles.item} onPress={props.onClickItem}>
-                <Image source={props.data.avatar == null ? Global.IMAGE.UNKNOWN : { uri: props.data.avatar }} style={styles.avatar}/>
+                <Image source={img == null ? Global.IMAGE.UNKNOWN : { uri: img }} style={styles.avatar}/>
                 <View style={styles.infoContainer}>
                     <Text style={styles.nameText}>{props.data.first_name + ' ' + props.data.last_name}</Text>
                     <Text>

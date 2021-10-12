@@ -81,7 +81,7 @@ export async function getContacts(userId) {
     const result = db.collection('contacts').where('user_id', '==', userId).get().then(res => {
         let contacts = [];
         res.forEach(doc => {
-            contacts.push(doc.data());
+            contacts.push({ ...doc.data(), docId: doc.id });
         });
         return contacts;
     }).catch(err => {
