@@ -4,6 +4,7 @@ import Global from '../../utils/global';
 import { useSelector, useDispatch } from 'react-redux';
 import { changeRecipient } from '../../store/actions/actions';
 import { deleteLocalFavorite } from '../../utils/db';
+import { deleteFavorite } from '../../firebase/crud';
 
 const DeleteDlg = (props) => {
 
@@ -28,7 +29,13 @@ const DeleteDlg = (props) => {
                 }
             }).catch(err => console.log(err));
         } else {
-
+            deleteFavorite(userId, recipient, props.item).then(result => {
+                if(result) {
+                    props.onChangeVisible(false);
+                    props.navigation.navigate('FavList');
+                } else
+                    Alert.alert('Failed to delete the item');
+            });
         }
     }
 

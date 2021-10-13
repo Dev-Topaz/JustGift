@@ -155,4 +155,32 @@ export async function addFavorite(userId, target, item) {
         console.log(err);
         return false;
     });
+
+    return result;
+}
+
+export async function deleteFavorite(userId, target, item) {
+    const ref = db.collection('contacts').where('user_id', '==', userId).where('first_name', '==', target.first_name).where('last_name', '==', target.last_name);
+    const result = ref.get().then(res => {
+        res.forEach(doc => {
+            let favorites = doc.data().favorites;
+            const idx = favorites.findIndex(element => element == item);
+            if(idx > -1) {
+                favorites.splice(idx, 1);
+                const updateResult = db.collection('contacts').doc(doc.id).update({ favorites: favorites }).then(() => {
+                    return true;
+                }).catch(err => {
+                    console.log(err);
+                    return false;
+                });
+                return updateResult;
+            } else
+                return false;
+        });
+    }).catch(err => {
+        console.log(err);
+        return false;
+    });
+
+    return result;
 }
