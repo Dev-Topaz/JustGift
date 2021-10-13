@@ -69,6 +69,7 @@ export default {
         LEFT: require('../assets/left.png'),
         RIGHT: require('../assets/right.png'),
         RELOAD: require('../assets/reload.png'),
+        SWIPE_BACKGROUND: require('../assets/swipe.png'),
     },
     FONT: {
         AVENIR_HEAVY: require('../assets/fonts/Avenir_heavy.ttf'),

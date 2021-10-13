@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-import GestureRecognizer from 'react-native-swipe-gestures';
-import LottieView from 'lottie-react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, ImageBackground, Image } from 'react-native';
+import SwipeCards from 'react-native-swipe-cards-deck';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Global from '../utils/global';
 import { useSelector } from 'react-redux';
@@ -9,17 +8,10 @@ import { useSelector } from 'react-redux';
 const Instruction = (props) => {
 
     const isFirstRun = useSelector(state => state.setting.isFirstRun);
-    const [direction, setDirection] = useState(false);
-    const animator = useRef(null);
+    const [index, setIndex] = useState(0);
 
-    useEffect(() => {
-        if(direction)
-            animator.current.play();
-    }, [direction]);
-
-    const handleSwipeLeft = () => {
-        //console.log('Left Swiped');
-        if(direction) {
+    const handleNope = () => {
+        if(index > 0) {
             if(isFirstRun)
                 AsyncStorage.setItem('firstrun', '1', err => {
                     if(err) {
@@ -31,36 +23,49 @@ const Instruction = (props) => {
                 }).catch(err => {
                     console.log(err);
                 });
-        }
+            return true;
+        } else
+            return false;
     }
 
-    const handleSwipeRight = () => {
-        //console.log('Right Swiped');
-        if(!direction)
-            setDirection(true);
+    const handleYup = () => {
+        if(index < 1) {
+            setIndex(index => index + 1);
+            return true;
+        } else
+            return false;
     }
+
+    const renderCardItem = item => (
+        <View style={styles.itemContainer}>
+            <View style={styles.itemContent}>
+                {
+                    item.img == null ? null : <Image source={item.img} style={styles.itemImage}/>
+                }
+            </View>
+        </View>
+    );
 
     return (
-        <View>
-            <Image source={direction ? Global.IMAGE.LEFT : Global.IMAGE.RIGHT} style={styles.bgImage}/>
-            <GestureRecognizer
-                onSwipeLeft={handleSwipeLeft}
-                onSwipeRight={handleSwipeRight}
-                style={styles.gestureContainer}
-                config={{
-                    velocityThreshold: 0.3,
-                    directionalOffsetThreshold: 80
-                }}
-            >
-                <LottieView
-                    ref={animator}
-                    source={direction ? Global.ANIMATION.SWIPE_LEFT : Global.ANIMATION.SWIPE_RIGHT}
-                    style={styles.animContainer}
-                    autoPlay
-                    loop
+        <ImageBackground source={Global.IMAGE.SWIPE_BACKGROUND} style={styles.bgContainer}>
+            <View style={styles.container}>
+                <SwipeCards
+                    cards={data}
+                    renderCard={renderCardItem}
+                    keyExtractor={item => item.id}
+                    actions={{
+                        nope: { onAction: handleNope, show: false },
+                        yup: { onAction: handleYup, show: false }
+                    }}
+                    smoothTransition={true}
+                    hasMaybeAction={false}
+                    stack={true}
+                    stackOffsetX={0}
+                    cardRemoved={() => {}}
+                    loop={false}
                 />
-            </GestureRecognizer>
-        </View>
+            </View>
+        </ImageBackground>
     );
 }
 
@@ -68,27 +73,49 @@ const styles = StyleSheet.create({
     bgContainer: {
         flex: 1,
         alignItems: 'center',
-    },
-    bgImage: {
-        width: '100%',
-        height: '100%',
         resizeMode: 'cover',
     },
-    gestureContainer: {
-        position: 'absolute',
+    container: {
+        width: '100%',
+        height: Global.SIZE.W_522,
+        marginTop: 115,
+    },
+    itemContainer: {
+        shadowOffset: { width: 0, height: 3 },
+        shadowRadius: 6,
+        shadowColor: 'black',
+        shadowOpacity: 0.3,
+        elevation: 5,
+    },
+    itemContent: {
         width: Global.SIZE.W_363,
         height: Global.SIZE.W_522,
-        top: 115,
-        left: (Global.SIZE.WIDTH - Global.SIZE.W_363) / 2,
-        backgroundColor: 'transparent',
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
+        overflow: 'hidden',
+        backgroundColor: 'black',
     },
-    animContainer: {
-        width: 150,
-        height: 150,
-        marginBottom: 150,
+    itemImage: {
+        width: '80%',
+        resizeMode: 'contain',
+        marginBottom: 50,
     },
 });
+
+const data = [
+    {
+        id: 0,
+        img: Global.IMAGE.RIGHT
+    },
+    {
+        id: 1,
+        img: Global.IMAGE.LEFT
+    },
+    {
+        id: 2,
+        img: null
+    }
+];
 
 export default Instruction;

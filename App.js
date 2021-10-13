@@ -29,6 +29,7 @@ export default function App() {
     Global.IMAGE.LEFT,
     Global.IMAGE.RIGHT,
     Global.IMAGE.RELOAD,
+    Global.IMAGE.SWIPE_BACKGROUND,
   ]);
 
   if(!fontsLoaded || !imagesLoaded)
