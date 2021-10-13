@@ -19,11 +19,11 @@ const AppWrapper = () => {
     const [subscribers, setSubscribers] = useState([]);
 
     useEffect(() => {
-        NetInfo.fetch().then(state => {
-            if(state.isConnected)
-                setOnline(true);
-            setLoaded(true);
-        });
+        //NetInfo.fetch().then(state => {
+        //    if(state.isConnected)
+        //        setOnline(true);
+        //    setLoaded(true);
+        //});
 
         const netSubscriber = NetInfo.addEventListener(state => {
             if(state.isConnected)
@@ -63,6 +63,8 @@ const AppWrapper = () => {
                 dispatch(changeUser(user.uid));
             else
                 dispatch(changeUser(null));
+                
+            setLoaded(true);
         });
 
         setSubscribers([...subscribers, netSubscriber, firebaseSubscriber]);

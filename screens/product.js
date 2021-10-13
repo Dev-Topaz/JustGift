@@ -57,6 +57,7 @@ const Product = (props) => {
     }, [contactVisible]);
 
     const updateContactData = (flag = false) => {
+        //console.log(userId);
         if(userId == null) {
             getLocalContacts().then(result => {
                 if(result != null) {
@@ -71,7 +72,6 @@ const Product = (props) => {
             }).catch(err => console.log(err));
         } else {
             getContacts(userId).then(result => {
-                console.log(result);
                 if(result != null) {
                     if(result.length < 1)
                         setContactVisible(true);
