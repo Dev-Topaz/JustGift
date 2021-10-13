@@ -1,21 +1,79 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Divider from 'react-native-divider';
+import * as GoogleAuthentication from 'expo-google-app-auth';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Crypto from 'expo-crypto';
+import * as Facebook from 'expo-facebook';
+import { firebase } from '../firebase/config';
 import Global from '../utils/global';
 import SvgIcon from '../utils/svg';
 
 const LogIn = (props) => {
 
     const logInApple = () => {
+        const nonce = Math.random().toString(36).substring(2, 10);
+        Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, nonce).then(hashedNonce => {
+            AppleAuthentication.signInAsync({
+                requestedScopes: [ AppleAuthentication.AppleAuthenticationScope.FULL_NAME, AppleAuthentication.AppleAuthenticationScope.EMAIL ],
+                nonce: hashedNonce
+            });
+        }).then(appleCredential => {
+            const { identityToken } = appleCredential;
+            const provider = new firebase.auth.OAuthProvider('apple.com');
+            const credential = provider.credential({
+                idToken: identityToken,
+                rawNonce: nonce,
+            });
+            firebase.auth().signInWithCredential(credential).then(() => {
 
+            }).catch(err => {
+                console.log(err);
+                Promise.reject();
+            });
+        });
     }
 
-    const logInFacebook = () => {
+    const logInFacebook = async() => {
+        try {
+            await Facebook.initializeAsync('553894349186153');
+            const { type, token } = await Facebook.logInWithReadPermissionsAsync({
+                permissions: ['public_profile', 'email'],
+            });
+            if(type === 'success') {
+                const credential = firebase.auth.FacebookAuthProvider.credential(token);
+                firebase.auth().signInWithCredential(credential).then(() => {
+                    
+                }).catch(err => {
+                    console.log(err);
+                });
+            } else {
 
+            }
+        } catch(e) {
+            console.log(e.message);
+        }
     }
 
     const logInGoogle = () => {
+        GoogleAuthentication.logInAsync({
+            iosClientId: '1071101303373-govjjmc1jh8gt2mnl5qk57v75vd01oj9.apps.googleusercontent.com',
+            scopes: ['profile', 'email']
+        }).then(result => {
+            if(result.type === 'success') {
+                const { idToken, accessToken } = result;
+                const credential = firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
+                firebase.auth().signInWithCredential(credential).then(() => {
 
+                }).catch(err => {
+                    console.log(err);
+                });
+            } else {
+                Promise.reject();
+            }
+        }).catch(err => {
+            console.log(err);
+        });
     }
 
     const logInEmail = () => {
