@@ -8,7 +8,7 @@ import Avatar from './avatar';
 import Global from '../../utils/global';
 import { useSelector, useDispatch } from 'react-redux';
 import { getStringFromDate } from '../../utils/helper';
-import { updateLocalContact, deleteLocalContact } from '../../utils/db';
+import { updateLocalContact, deleteLocalContact, clearCacheImage } from '../../utils/db';
 import { deleteContact, updateContact, uploadImage } from '../../firebase/crud';
 import { changeRecipient } from '../../store/actions/actions';
 
@@ -108,9 +108,13 @@ const EditDlg = (props) => {
                         };
                         updateContact(props.data.docId, data).then(result => {
                             if(result) {
-                                props.onChangeVisible(false);
-                                if(props.data.first_name == recipient.first_name && props.data.last_name == recipient.last_name)
-                                    dispatch(changeRecipient(data));
+                                clearCacheImage(props.data.docId).then(res => {
+                                    if(res) {
+                                        props.onChangeVisible(false);
+                                        if(props.data.first_name == recipient.first_name && props.data.last_name == recipient.last_name)
+                                            dispatch(changeRecipient(data));
+                                    }
+                                }).catch(err => console.log(err));
                             } else
                                 Alert.alert('Failed to update the event');
                         }).catch(err => console.log(err));

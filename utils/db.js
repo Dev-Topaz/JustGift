@@ -190,3 +190,15 @@ export async function deleteLocalFavorite(recipient, target) {
 
     return result;
 }
+
+export async function clearCacheImage(target) {
+    const path = FileSystem.cacheDirectory + target;
+    const result = FileSystem.deleteAsync(path).then(() => {
+        return true;
+    }).catch(err => {
+        console.log(err);
+        return false;
+    });
+
+    return result;
+}

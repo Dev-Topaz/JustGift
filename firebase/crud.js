@@ -118,6 +118,7 @@ export async function deleteContact(docId) {
 
 export async function updateContact(originId, target) {
     const result = db.collection('contacts').doc(originId).update({
+        avatar: target.avatar,
         first_name: target.first_name,
         last_name: target.last_name,
         occasion: target.occasion,
