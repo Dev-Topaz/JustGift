@@ -18,17 +18,18 @@ const ContactItem = (props) => {
             setImg(props.data.avatar);
             //setImgLoaded(true);
         } else {
-            FileSystem.getInfoAsync(imgUri).then(metadata => {
-                if(metadata.exists) {
-                    setImg(imgUri);
-                    //setImgLoaded(true);
-                } else {
-                    FileSystem.downloadAsync(props.data.avatar, imgUri).then(({ uri }) => {
-                        setImg(uri);
+            if(props.data.avatar != null)
+                FileSystem.getInfoAsync(imgUri).then(metadata => {
+                    if(metadata.exists) {
+                        setImg(imgUri);
                         //setImgLoaded(true);
-                    }).catch(err => console.log(err));
-                }
-            }).catch(err => console.log(err));
+                    } else {
+                        FileSystem.downloadAsync(props.data.avatar, imgUri).then(({ uri }) => {
+                            setImg(uri);
+                            //setImgLoaded(true);
+                        }).catch(err => console.log(err));
+                    }
+                }).catch(err => console.log(err));
         }
     }, []);
 

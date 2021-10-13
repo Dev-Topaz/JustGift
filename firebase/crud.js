@@ -106,7 +106,7 @@ export async function createContact(data) {
 
 export async function deleteContact(docId) {
     const result = db.collection('contacts').doc(docId).delete().then(() => {
-        console.log('contact delete success');
+        //console.log('contact delete success');
         return true;
     }).catch(err => {
         console.log(err);
@@ -135,7 +135,7 @@ export async function updateContact(originId, target) {
 
 export async function addFavorite(userId, target, item) {
     const ref = db.collection('contacts').where('user_id', '==', userId).where('first_name', '==', target.first_name).where('last_name', '==', target.last_name);
-    const result = ref.get().then(res => {
+    return ref.get().then(res => {
         res.forEach(doc => {
             let favorites = doc.data().favorites;
             if(!favorites.includes(item))
@@ -143,37 +143,33 @@ export async function addFavorite(userId, target, item) {
             else
                 return false;
             
-            const updateResult = db.collection('contacts').doc(doc.id).update({ favorites: favorites }).then(() => {
+            db.collection('contacts').doc(doc.id).update({ favorites: favorites }).then(() => {
                 return true;
             }).catch(err => {
                 console.log(err);
                 return false;
             });
-            return updateResult;
         });
     }).catch(err => {
         console.log(err);
         return false;
     });
-
-    return result;
 }
 
 export async function deleteFavorite(userId, target, item) {
     const ref = db.collection('contacts').where('user_id', '==', userId).where('first_name', '==', target.first_name).where('last_name', '==', target.last_name);
-    const result = ref.get().then(res => {
+    return ref.get().then(res => {
         res.forEach(doc => {
             let favorites = doc.data().favorites;
             const idx = favorites.findIndex(element => element == item);
             if(idx > -1) {
                 favorites.splice(idx, 1);
-                const updateResult = db.collection('contacts').doc(doc.id).update({ favorites: favorites }).then(() => {
+                db.collection('contacts').doc(doc.id).update({ favorites: favorites }).then(() => {
                     return true;
                 }).catch(err => {
                     console.log(err);
                     return false;
                 });
-                return updateResult;
             } else
                 return false;
         });
@@ -181,6 +177,4 @@ export async function deleteFavorite(userId, target, item) {
         console.log(err);
         return false;
     });
-
-    return result;
 }

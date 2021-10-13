@@ -126,9 +126,9 @@ const Product = (props) => {
                 }
             }).catch(err => console.log(err));
         } else {
-            addFavorite(userId, recipient, item.docId).then(result => {
-                if(result) {
-                    let target = recipient;
+            addFavorite(userId, recipient, item.docId).then(() => {
+                let target = recipient;
+                if(!target.favorites.includes(item.docId)) {
                     target.favorites.push(item.docId);
                     dispatch(changeRecipient(target));
                 }
