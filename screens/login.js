@@ -77,7 +77,7 @@ const LogIn = (props) => {
     }
 
     const logInEmail = () => {
-        props.navigation.navigate('SignIn');
+        props.navigation.navigate('SignUp');
     }
 
     return (
